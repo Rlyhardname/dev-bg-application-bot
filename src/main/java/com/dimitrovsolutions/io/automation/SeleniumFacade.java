@@ -77,6 +77,8 @@ public class SeleniumFacade implements Destructor {
     public void runScript() throws InterruptedException {
         configureDriver();
 
+        navigateToLandingPage();
+
         acceptCookies();
 
         navigateToJobs();
@@ -114,24 +116,32 @@ public class SeleniumFacade implements Destructor {
         }
     }
 
-    private void configureDriver() throws InterruptedException {
+    private void configureDriver() {
         driver.manage().window().maximize();
-        driver.get("https://dev.bg");
+    }
+
+    private void navigateToLandingPage() throws InterruptedException {
+        driver.get(context.getNavigationConfig().route().remove());
+        addSessionCookie();
+        Thread.sleep(1500);
+    }
+
+    private void addSessionCookie() {
         try {
             driver.manage().addCookie(new Cookie(id, value, path));
         } catch (IllegalArgumentException e) {
             logger.log(Level.SEVERE, "Login cookies didn't load... Exit application");
             throw new IllegalArgumentException();
         }
-
-        Thread.sleep(1500);
     }
 
     private void navigateToJobs() throws InterruptedException {
-        driver.get("https://dev.bg/company/jobs/java/");
-        Thread.sleep(1000);
-        driver.get("https://dev.bg/company/jobs/java/?_seniority=intern");
-        Thread.sleep(1000);
+        String route;
+        while ((route = context.getNavigationConfig().route().poll()) != null) {
+            driver.get(route);
+            Thread.sleep(1000);
+        }
+
     }
 
     private void acceptCookies() throws InterruptedException {

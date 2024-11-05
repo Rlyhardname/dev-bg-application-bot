@@ -3,6 +3,7 @@ package com.dimitrovsolutions.context;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.cache.Cache;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
+import com.dimitrovsolutions.model.NavigationConfig;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -19,9 +20,11 @@ public class Context implements Destructor {
     private final HttpClientFacade client = new HttpClientFacade();
     private final Cache jobsCache = new Cache();
     private final Cache alreadyAppliedCache = new Cache();
+    private final NavigationConfig navigationConfig;
     private Document document;
 
-    public Context() {
+    public Context(NavigationConfig navigationConfig) {
+        this.navigationConfig = navigationConfig;
         try {
             fileHandler = new FileHandler("src/main/resources/logs/context.log", true);
             fileHandler.setFormatter(new SimpleFormatter());
@@ -57,6 +60,10 @@ public class Context implements Destructor {
 
     public Document getDocument() {
         return document;
+    }
+
+    public NavigationConfig getNavigationConfig() {
+        return navigationConfig;
     }
 
     @Override

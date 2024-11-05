@@ -5,6 +5,7 @@ import com.dimitrovsolutions.io.automation.SeleniumFacade;
 import com.dimitrovsolutions.context.Context;
 import com.dimitrovsolutions.io.html.Mapper;
 import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.model.NavigationConfig;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
@@ -24,16 +25,16 @@ public class Orchestrator implements Destructor {
     private static final String START_URL = "https://dev.bg/company/jobs/java/?_seniority=intern";
     private static final String LOG_DIRECTORY = "src/main/resources/logs/orchestrator.log";
 
-    public static Context start() {
+    public static Context start(NavigationConfig navigationConfig) {
         if (orchestrator == null) {
-            orchestrator = new Orchestrator();
+            orchestrator = new Orchestrator(navigationConfig);
         }
 
         return orchestrator.getContext();
     }
 
-    private Orchestrator() {
-        this.context = new Context();
+    private Orchestrator(NavigationConfig navigationConfig) {
+        this.context = new Context(navigationConfig);
         SeleniumFacade selenium = null;
         try {
             fileHandler = new FileHandler(LOG_DIRECTORY, true);
