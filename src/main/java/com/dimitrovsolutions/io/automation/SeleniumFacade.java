@@ -26,13 +26,14 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class SeleniumFacade implements Destructor {
-    private final WebDriver driver;
-    private final Context context;
     private static final Logger logger = Logger.getLogger(SeleniumFacade.class.getName());
     private static FileHandler fileHandler;
     private static String id;
     private static String value;
     private static String path;
+    private final WebDriver driver;
+    private final Context context;
+
 
     static {
         try (BufferedReader br = Files.newBufferedReader(Path.of("src/main/resources/cookies/cookie.txt").toAbsolutePath())) {
