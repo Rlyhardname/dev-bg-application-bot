@@ -1,7 +1,9 @@
 package com.dimitrovsolutions.context;
 
-import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.cache.Cache;
+import com.dimitrovsolutions.cache.LoaderCache;
+import com.dimitrovsolutions.cache.PersistenceCache;
+import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
 import com.dimitrovsolutions.model.NavigationConfig;
 import org.jsoup.nodes.Document;
@@ -18,9 +20,9 @@ public class Context implements Destructor {
     private static final Logger logger = Logger.getLogger(Context.class.getName());
     private final FileHandler fileHandler;
     private final HttpClientFacade client = new HttpClientFacade();
-    private final Cache jobsCache = new Cache();
-    private final Cache alreadyAppliedCache = new Cache();
     private final NavigationConfig navigationConfig;
+    private final Cache alreadyAppliedCache = new LoaderCache();
+    private final Cache jobsCache = new PersistenceCache();
     private Document document;
 
     public Context(NavigationConfig navigationConfig) {
