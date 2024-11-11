@@ -22,7 +22,6 @@ public class Orchestrator implements Destructor {
     private final Context context;
     private final FileHandler fileHandler;
     private static final Logger logger = Logger.getLogger(Orchestrator.class.getName());
-    private static final String START_URL = "https://dev.bg/company/jobs/java/?_seniority=intern";
     private static final String LOG_DIRECTORY = "src/main/resources/logs/orchestrator.log";
 
     public static Context start(NavigationConfig navigationConfig) {
@@ -44,9 +43,7 @@ public class Orchestrator implements Destructor {
             logger.setLevel(Level.ALL);
             logger.log(Level.INFO, "Application started at: " + LocalDateTime.now());
 
-            JobLoader.loadJobs(context.getAlreadyAppliedCache().getCache());
-
-            collectApplicationUrls(START_URL);
+            collectApplicationUrls(navigationConfig.scrapePageUrl());
 
             selenium = new SeleniumFacade(context, "chrome");
             selenium.runScript();
