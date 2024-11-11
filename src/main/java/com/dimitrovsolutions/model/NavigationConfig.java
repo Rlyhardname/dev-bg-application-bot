@@ -1,7 +1,7 @@
 package com.dimitrovsolutions.model;
 
-import java.util.ArrayDeque;
+import java.util.Queue;
 
-public record NavigationConfig(String landingPage, ArrayDeque<String> route) {
+public record NavigationConfig(String scrapePageUrl, String landingPage, Queue<String> route) {
 }
 
