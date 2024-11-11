@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Cache {
+public abstract class Cache {
     private final Map<Integer, Job> cache;
 
     public Cache(Map<Integer, Job> cache) {
@@ -41,7 +41,11 @@ public class Cache {
                 .toList();
     }
 
-    public void printCache() {
+    public static void printCache(Map<Integer, Job> cache) {
         cache.forEach((k, v) -> System.out.println("Jobs ID: " + k + " " + v));
     }
+
+    public abstract void loadEntries();
+
+    public abstract void saveEntry(int id, Job job);
 }
