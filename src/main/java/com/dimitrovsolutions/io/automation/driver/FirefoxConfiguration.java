@@ -7,28 +7,41 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import java.io.File;
 
 public class FirefoxConfiguration implements Configurable {
-    private final FirefoxProfile firefoxProfile;
     private final FirefoxOptions firefoxOptions;
 
     public FirefoxConfiguration() {
         setProperties();
 
-        String FIREFOX_PROFILE_SRC = "C:\\Users\\batba\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\profile_name";
-        firefoxProfile = new FirefoxProfile(new File(FIREFOX_PROFILE_SRC));
         firefoxOptions = new FirefoxOptions();
+
+        String firefox_profile_name = "Placeholder profile";
+        String FIREFOX_PROFILE_SRC = "C:\\Users\\batba\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\" + firefox_profile_name;
+        FirefoxProfile firefoxProfile = null;
+        try {
+            firefoxProfile = new FirefoxProfile(new File(FIREFOX_PROFILE_SRC));
+            firefoxOptions.setProfile(firefoxProfile);
+        } catch (RuntimeException e) {
+            // log no profile, or do nothing
+        }
 
         String BINARY_SRC = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
         firefoxOptions.setBinary(BINARY_SRC);
-        firefoxOptions.setProfile(firefoxProfile);
     }
 
     public FirefoxConfiguration(String profilePath, String binaryPath) {
         setProperties();
-        firefoxProfile = new FirefoxProfile(new File(profilePath));
+
         firefoxOptions = new FirefoxOptions();
 
+        FirefoxProfile firefoxProfile = null;
+        try {
+            firefoxProfile = new FirefoxProfile(new File(profilePath));
+            firefoxOptions.setProfile(firefoxProfile);
+        } catch (RuntimeException e) {
+            // log no profile, or do nothing
+        }
+
         firefoxOptions.setBinary(binaryPath);
-        firefoxOptions.setProfile(firefoxProfile);
     }
 
     @Override
