@@ -92,5 +92,9 @@ public class Orchestrator implements Destructor {
             fileHandler.close();
         }
 
+        if (orchestrator != null) {
+            orchestrator = null;
+        }
+
     }
 }
