@@ -16,14 +16,31 @@ public class CacheTest {
     @Test
     void cache_constructor_throws_NullPointerException() {
         var expected = NullPointerException.class;
-        assertThrows(expected, () -> new Cache(null));
+
+
+        assertThrows(expected, () -> new PersistenceCache(null));
+        assertThrows(expected, () -> new LoaderCache(null));
+        assertThrows(expected, () -> new Cache(null) {
+            @Override
+            public void loadEntries() {
+
+            }
+
+            @Override
+            public void saveEntry(int id, Job job) {
+
+            }
+        });
+
     }
 
     @Test
     void fetch_cache_returns_map() {
-        Map<Integer, Job> fetchedCache = new Cache().getCache();
+        Map<Integer, Job> persistenceCache = new PersistenceCache().getCache();
+        Map<Integer, Job> loaderCache = new LoaderCache().getCache();
 
-        assertTrue(Objects.nonNull(fetchedCache));
+        assertTrue(Objects.nonNull(persistenceCache));
+        assertTrue(Objects.nonNull(loaderCache));
     }
 
     @Nested
@@ -46,7 +63,17 @@ public class CacheTest {
                             "Beginner Java/Kotlin Developer",
                             "https://dev.bg/company/jobads/markovski-solutions-beginner-java-kotlin-developer/",
                             LocalDateTime.now())
-            ));
+            )) {
+                @Override
+                public void loadEntries() {
+
+                }
+
+                @Override
+                public void saveEntry(int id, Job job) {
+
+                }
+            };
 
         }
 
