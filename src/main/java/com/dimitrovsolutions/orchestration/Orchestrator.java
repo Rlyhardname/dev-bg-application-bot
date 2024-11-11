@@ -33,8 +33,8 @@ public class Orchestrator implements Destructor {
     }
 
     private Orchestrator(NavigationConfig navigationConfig) {
-        this.context = new Context(navigationConfig);
-        SeleniumFacade selenium = null;
+        this.context = new Context(new SeleniumFacade(navigationConfig, "chrome"));
+
         try {
             fileHandler = new FileHandler(LOG_DIRECTORY, true);
             fileHandler.setFormatter(new SimpleFormatter());
@@ -45,13 +45,12 @@ public class Orchestrator implements Destructor {
 
             collectApplicationUrls(navigationConfig.scrapePageUrl());
 
-            selenium = new SeleniumFacade(context, "chrome");
-            selenium.runScript();
+            context.runSelenium();
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         } finally {
             logger.log(Level.INFO, "Application closing without errors: " + LocalDateTime.now());
-            tearDownFileHandlers(selenium);
+            tearDownFileHandlers();
         }
 
     }
@@ -73,12 +72,8 @@ public class Orchestrator implements Destructor {
         System.out.println(htmlResponseBody);
     }
 
-    public void tearDownFileHandlers(SeleniumFacade selenium) {
+    public void tearDownFileHandlers() {
         tearDown();
-
-        if (selenium != null) {
-            selenium.tearDown();
-        }
 
         context.tearDown();
         Mapper.tearDown();

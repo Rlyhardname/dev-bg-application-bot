@@ -1,10 +1,12 @@
 package com.dimitrovsolutions.io.automation;
 
+import com.dimitrovsolutions.cache.Cache;
 import com.dimitrovsolutions.io.Destructor;
-import com.dimitrovsolutions.context.Context;
 import com.dimitrovsolutions.io.automation.driver.DriverConfigurations;
 import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.io.network.HttpClientFacade;
 import com.dimitrovsolutions.model.Job;
+import com.dimitrovsolutions.model.NavigationConfig;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -32,7 +34,7 @@ public class SeleniumFacade implements Destructor {
     private static String value;
     private static String path;
     private final WebDriver driver;
-    private final Context context;
+    private final NavigationConfig navigationConfig;
 
 
     static {
@@ -62,8 +64,8 @@ public class SeleniumFacade implements Destructor {
         }
     }
 
-    public SeleniumFacade(Context context, String browser) {
-        this.context = context;
+    public SeleniumFacade(NavigationConfig navigationConfig, String browser) {
+        this.navigationConfig = navigationConfig;
         driver = initDriver(browser);
     }
 
@@ -75,7 +77,7 @@ public class SeleniumFacade implements Destructor {
         };
     }
 
-    public void runScript() throws InterruptedException {
+    public void runScript(HttpClientFacade client, Cache jobsCache) throws InterruptedException {
         configureDriver();
 
         navigateToLandingPage();
@@ -85,7 +87,7 @@ public class SeleniumFacade implements Destructor {
         navigateToJobs();
 
         try {
-            for (Map.Entry<Integer, Job> entry : context.getJobsCache().getCache().entrySet()) {
+            for (Map.Entry<Integer, Job> entry : jobsCache.getCache().entrySet()) {
                 Job job = openJobListing(entry);
 
                 clickFirstApplicationButton();
@@ -99,7 +101,7 @@ public class SeleniumFacade implements Destructor {
                 if (isPageUrlSame(job.url())) {
                     logger.log(Level.INFO, "NEW JOB " + entry.getKey() + " " + job);
 
-                    logPageContentAfterSendingApplication();
+                    logPageContentAfterSendingApplication(client);
                     // Should save if application doesn't fail
                     JobLoader.saveJobToFile(entry.getKey(), job);
                     Thread.sleep(6 * 1000 * 60);
@@ -113,7 +115,7 @@ public class SeleniumFacade implements Destructor {
             logger.log(Level.WARNING, "Interrupted exception throw");
             throw new RuntimeException(e);
         } finally {
-            driver.quit();
+            quitDriver();
         }
     }
 
@@ -122,7 +124,7 @@ public class SeleniumFacade implements Destructor {
     }
 
     private void navigateToLandingPage() throws InterruptedException {
-        driver.get(context.getNavigationConfig().route().remove());
+        driver.get(navigationConfig.route().remove());
         addSessionCookie();
         Thread.sleep(1500);
     }
@@ -138,7 +140,7 @@ public class SeleniumFacade implements Destructor {
 
     private void navigateToJobs() throws InterruptedException {
         String route;
-        while ((route = context.getNavigationConfig().route().poll()) != null) {
+        while ((route = navigationConfig.route().poll()) != null) {
             driver.get(route);
             Thread.sleep(1000);
         }
@@ -189,11 +191,17 @@ public class SeleniumFacade implements Destructor {
         return url.equals(driver.getCurrentUrl());
     }
 
-    private void logPageContentAfterSendingApplication() {
-        HttpRequest request = context.getClient().getRequest(driver.getCurrentUrl());
-        HttpResponse<String> response = context.getClient().send(request);
+    private void logPageContentAfterSendingApplication(HttpClientFacade client) {
+        HttpRequest request = client.getRequest(driver.getCurrentUrl());
+        HttpResponse<String> response = client.send(request);
         String body = response.body();
         logger.log(Level.CONFIG, body);
+    }
+
+    public void quitDriver() {
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
     @Override
