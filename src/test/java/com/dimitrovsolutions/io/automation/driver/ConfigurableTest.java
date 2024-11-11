@@ -13,7 +13,7 @@ public class ConfigurableTest {
         String key = "webdriver.gecko.driver";
         String expected = "E:\\geckodriver-v0.35.0-win32\\geckodriver.exe";
 
-        var obj = new FirefoxConfiguration();
+        new FirefoxConfiguration();
         String actual = System.getProperty(key);
 
         assertEquals(expected, actual);
@@ -24,7 +24,7 @@ public class ConfigurableTest {
         String key = "webdriver.chrome.driver";
         String expected = "E:\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe";
 
-        var obj = new ChromeConfigurations();
+        new ChromeConfigurations();
         String actual = System.getProperty(key);
 
         assertEquals(expected, actual);
