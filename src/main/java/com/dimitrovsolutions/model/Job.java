@@ -4,6 +4,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Main entity representing a job listing.
+ */
 public record Job(String title, String url, LocalDateTime localDate) {
 
     public boolean olderThanThreeMonths() {

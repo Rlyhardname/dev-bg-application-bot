@@ -6,7 +6,10 @@ import com.dimitrovsolutions.orchestration.Orchestrator;
 import java.util.ArrayDeque;
 import java.util.List;
 
-public class entryPoint {
+/**
+ * Start application from this file.
+ */
+public class EntryPoint {
     public static void main(String[] args) {
         Orchestrator.start(new NavigationConfig(
                 "https://dev.bg/company/jobs/java/?_seniority=intern",

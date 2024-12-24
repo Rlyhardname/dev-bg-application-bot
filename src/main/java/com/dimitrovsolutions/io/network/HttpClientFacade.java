@@ -14,6 +14,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * HttpClientWrapper abstracting HttpClient and corresponding Logger creation, exposing just
+ * needed http methods.
+ */
 public class HttpClientFacade implements Destructor {
 
     public static final Logger logger = Logger.getLogger(HttpClientFacade.class.getName());
@@ -35,12 +39,18 @@ public class HttpClientFacade implements Destructor {
         }
     }
 
+    /**
+     * Builds new HttpRequest from string url object.
+     */
     public HttpRequest getRequest(String url) {
         return HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
     }
 
+    /**
+     * Sends HttpAsync request to
+     */
     public HttpResponse<String> send(HttpRequest request) {
         try {
             return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString()).get();
@@ -54,7 +64,7 @@ public class HttpClientFacade implements Destructor {
     }
 
     /**
-     * Used in finallis e
+     * Used in finally block of Orchestrator
      */
     @Override
     public void tearDown() {

@@ -17,6 +17,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * The class responsible for the complete flow of the application
+ */
 public class Orchestrator implements Destructor {
     private static Orchestrator orchestrator;
     private final Context context;
@@ -43,7 +46,7 @@ public class Orchestrator implements Destructor {
             logger.setLevel(Level.ALL);
             logger.log(Level.INFO, "Application started at: " + LocalDateTime.now());
 
-            collectApplicationUrls(navigationConfig.scrapePageUrl());
+            sendHttpRequestParseResponseScrapeDataIntoJobsCache(navigationConfig.scrapePageUrl());
 
             context.runSelenium();
         } catch (InterruptedException | IOException e) {
@@ -55,23 +58,48 @@ public class Orchestrator implements Destructor {
 
     }
 
-    private void collectApplicationUrls(String url) {
-        HttpRequest request = context.getClient().getRequest(url);
+    /**
+     * Builds Http requests, sends it, parses the response body and scrapes the new jobs listings
+     * into jobsCache.
+     */
+    private void sendHttpRequestParseResponseScrapeDataIntoJobsCache(String url) {
+        HttpRequest request = targetedPageForWebScrapping(url);
 
-        HttpResponse<String> response = context.getClient().send(request);
+        HttpResponse<String> response = sendRequestReturnHttpResponse(request);
 
-        String body = context.parseDocBody(response);
-        context.setDocument(Jsoup.parse(body));
+        String stringRepresentationOfDocBody = context.parseDocBody(response);
 
-        print("BODY " + body);
+        context.setDocument(Jsoup.parse(stringRepresentationOfDocBody));
+
+        print("BODY " + stringRepresentationOfDocBody);
 
         DocumentScraper.traverseDocumentAndAddNewJobsToJobsCache(context);
     }
 
+    /**
+     * Build httpRequest for the provided url
+     */
+    private HttpRequest targetedPageForWebScrapping(String url){
+        return context.getClient().getRequest(url);
+    }
+
+    /**
+     * send async request and on receiving response returns HttpResponse for the scrapper to handle
+     */
+    private HttpResponse<String> sendRequestReturnHttpResponse (HttpRequest request){
+        return context.getClient().send(request);
+    }
+
+    /**
+     * Print String representation of response body into the command line.
+     */
     private static void print(String htmlResponseBody) {
         System.out.println(htmlResponseBody);
     }
 
+    /**
+     * Teardown used in finally block of Orchestrator.
+     */
     public void tearDownFileHandlers() {
         tearDown();
 
@@ -84,6 +112,9 @@ public class Orchestrator implements Destructor {
         return context;
     }
 
+    /**
+     * Tear down log related file handler and log event.
+     */
     @Override
     public void tearDown() {
         logger.log(Level.INFO, "Application logger tear down at: " + LocalDateTime.now());

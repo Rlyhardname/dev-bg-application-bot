@@ -27,17 +27,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * Wrapper for selenium, exposing just the functionality it will produce
+ */
 public class SeleniumFacade implements Destructor {
 
     private static final Logger logger = Logger.getLogger(SeleniumFacade.class.getName());
     private static FileHandler fileHandler;
+
     private static String id;
     private static String value;
     private static String path;
+
     private final WebDriver driver;
     private final NavigationConfig navigationConfig;
 
-
+    /**
+     * Preloads login cookies from file into private static fields id,value and path. Sets log directory for log file.
+     */
     static {
         try (BufferedReader br = Files.newBufferedReader(Path.of("src/main/resources/cookies/cookie.txt").toAbsolutePath())) {
             String LOG_DIRECTORY = "src/main/resources/logs/selenium.log";
@@ -70,6 +77,9 @@ public class SeleniumFacade implements Destructor {
         driver = initDriver(browser);
     }
 
+    /**
+     * Creates a webdriver based on browser chosen and opens an instance of the browser.
+     */
     private WebDriver initDriver(String browser) {
         return switch (browser.toLowerCase()) {
             case "firefox" -> DriverConfigurations.firefoxConfiguration().getDriver();
@@ -78,6 +88,9 @@ public class SeleniumFacade implements Destructor {
         };
     }
 
+    /**
+     * Selenium script complete flow block.
+     */
     public void runScript(HttpClientFacade client, Cache jobsCache) throws InterruptedException {
         configureDriver();
 
@@ -89,7 +102,7 @@ public class SeleniumFacade implements Destructor {
 
         try {
             for (Map.Entry<Integer, Job> entry : jobsCache.getCache().entrySet()) {
-                Job job = openJobListing(entry);
+                Job job = openJobListing(entry.getValue());
 
                 clickFirstApplicationButton();
 
@@ -120,16 +133,25 @@ public class SeleniumFacade implements Destructor {
         }
     }
 
+    /**
+     * Maximize browser window by default.
+     */
     private void configureDriver() {
         driver.manage().window().maximize();
     }
 
+    /**
+     * Go to the predefined route and add session cookies, to accept website cookies and login.
+     */
     private void navigateToLandingPage() throws InterruptedException {
         driver.get(navigationConfig.route().remove());
         addSessionCookie();
         Thread.sleep(1500);
     }
 
+    /**
+     * Add session/login cookies to webdriver implementation used.
+     */
     private void addSessionCookie() {
         try {
             driver.manage().addCookie(new Cookie(id, value, path));
@@ -139,15 +161,20 @@ public class SeleniumFacade implements Destructor {
         }
     }
 
+    /**
+     * Move towards the end of the navigation route, pausing 1 second per click, simulating real user.
+     */
     private void navigateToJobs() throws InterruptedException {
         String route;
         while ((route = navigationConfig.route().poll()) != null) {
             driver.get(route);
             Thread.sleep(1000);
         }
-
     }
 
+    /**
+     * Accept website cookies.
+     */
     private void acceptCookies() throws InterruptedException {
         WebElement element = driver.findElement(By.className("cmplz-accept"));
         if (element != null) {
@@ -157,8 +184,7 @@ public class SeleniumFacade implements Destructor {
         Thread.sleep(1500);
     }
 
-    private Job openJobListing(Map.Entry<Integer, Job> entry) throws InterruptedException {
-        Job job = entry.getValue();
+    private Job openJobListing(Job job) throws InterruptedException {
         driver.get(job.url());
         Thread.sleep(1000);
 
@@ -212,6 +238,5 @@ public class SeleniumFacade implements Destructor {
         if (fileHandler != null) {
             fileHandler.close();
         }
-
     }
 }
