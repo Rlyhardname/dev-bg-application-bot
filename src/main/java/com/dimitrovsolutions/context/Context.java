@@ -28,8 +28,8 @@ public class Context implements Destructor {
 
     private final HttpClientFacade client = new HttpClientFacade();
 
-    private final Cache alreadyAppliedCache = new LoaderCache();
-    private final Cache jobsCache = new PersistenceCache();
+    private final LoaderCache alreadyAppliedCache = new LoaderCache();
+    private final PersistenceCache jobsCache = new PersistenceCache();
 
     private final SeleniumFacade seleniumFacade;
 
@@ -93,7 +93,7 @@ public class Context implements Destructor {
      * Gets preloaded on start Cache Object with all previously applied to jobs.
      */
     public LoaderCache getAlreadyAppliedCache() {
-        return (LoaderCache) alreadyAppliedCache;
+        return alreadyAppliedCache;
     }
 
     /**
