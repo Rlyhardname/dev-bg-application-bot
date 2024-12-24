@@ -6,9 +6,12 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 
 import java.io.File;
 
+/**
+ * Predefined firefox browser configuration for selenium
+ */
 public class FirefoxConfiguration implements Configurable {
     private final FirefoxOptions firefoxOptions;
-    private static String BINARY_SRC = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    private static String FIREFOX_EXE_PATH = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     private static String firefox_profile_name = "Placeholder profile";
     private static String FIREFOX_PROFILE_SRC = "C:\\Users\\batba\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\" + firefox_profile_name;
 
@@ -24,7 +27,7 @@ public class FirefoxConfiguration implements Configurable {
             // log no profile, or do nothing
         }
 
-        firefoxOptions.setBinary(BINARY_SRC);
+        firefoxOptions.setBinary(FIREFOX_EXE_PATH);
     }
 
     public FirefoxConfiguration(String profilePath, String binaryPath) {
@@ -43,11 +46,18 @@ public class FirefoxConfiguration implements Configurable {
         firefoxOptions.setBinary(binaryPath);
     }
 
+    /**
+     * Set driver to system property, used by FireFoxOptions object
+     */
     @Override
     public void setProperties() {
         System.setProperty("webdriver.gecko.driver", "../resources/drivers/geckodriver.exe");
     }
 
+    /**
+     * Creates new Firefox browser webdriver from FirefoxOptions(Opens new browser tab)
+     * using geckodriver.exe for selenium to execute on
+     */
     @Override
     public FirefoxDriver getDriver() {
         return new FirefoxDriver(firefoxOptions);

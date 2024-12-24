@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Base Class for LoaderCase - responsible for loading entries from file system,
+ * and PersistenceCache - responsible for saving scrapped entries to file system.
+ */
 public abstract class Cache {
     private final Map<Integer, Job> cache;
 
