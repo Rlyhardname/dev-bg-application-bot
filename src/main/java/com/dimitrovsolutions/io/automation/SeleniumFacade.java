@@ -1,9 +1,8 @@
 package com.dimitrovsolutions.io.automation;
 
-import com.dimitrovsolutions.cache.Cache;
+import com.dimitrovsolutions.cache.PersistenceCache;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.driver.DriverConfigurations;
-import com.dimitrovsolutions.io.files.JobFileSystemHandler;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
 import com.dimitrovsolutions.model.Job;
 import com.dimitrovsolutions.model.NavigationConfig;
@@ -91,7 +90,7 @@ public class SeleniumFacade implements Destructor {
     /**
      * Selenium script complete flow block.
      */
-    public void runScript(HttpClientFacade client, Cache jobsCache) throws InterruptedException {
+    public void runScript(HttpClientFacade client, PersistenceCache jobsCache) throws InterruptedException {
         configureDriver();
 
         navigateToLandingPage();
@@ -117,7 +116,7 @@ public class SeleniumFacade implements Destructor {
 
                     logPageContentAfterSendingApplication(client);
                     // Should save if application doesn't fail
-                    JobFileSystemHandler.saveJobToFile(entry.getKey(), job);
+                    jobsCache.saveEntry(entry.getKey(), job);
                     Thread.sleep(6 * 1000 * 60);
                 } else {
                     logger.log(Level.INFO, "Application complete for job" + entry.getKey() + " " + job);
