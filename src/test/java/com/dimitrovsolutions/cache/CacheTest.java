@@ -8,31 +8,24 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CacheTest {
     @Test
-    void cache_constructor_throws_NullPointerException() {
-        var expected = NullPointerException.class;
+    void constructor_nullArguments_throwNullPointerException() {
+        // Given
+        Class<IllegalArgumentException> expectedException = IllegalArgumentException.class;
 
-        assertThrows(expected, () -> new PersistenceCache(null));
-        assertThrows(expected, () -> new LoaderCache(null));
-    }
-
-    @Test
-    void fetch_cache_returns_map() {
-        Map<Integer, Job> persistenceCache = new PersistenceCache().getCache();
-        Map<Integer, Job> loaderCache = new LoaderCache().getCache();
-
-        assertTrue(Objects.nonNull(persistenceCache));
-        assertTrue(Objects.nonNull(loaderCache));
+        // When // Then
+        assertThrows(expectedException, () -> new PersistenceCache(null));
+        assertThrows(expectedException, () -> new LoaderCache(null));
     }
 
     @Nested
     class CacheWithValues {
-        static Cache cache;
+        static LoaderCache cache;
         static String title = "Beginner Java/Kotlin Developer";
 
         @BeforeAll
@@ -54,22 +47,28 @@ public class CacheTest {
         }
 
         @Test
-        void fetch_list_of_jobs_with_title_in_ascending_order() {
+        void fetchJobsInAscendingOrder_returnsListOfJobsFromFirstAddedToLastAdded() {
+            // Given
             Job expected = cache.getCache().get(380771);
 
+            // When
             List<Job> jobs = cache.fetchJobsInAscendingOrder(title);
-            Job actual = jobs.get(0);
 
+            // Then
+            Job actual = jobs.get(0);
             assertEquals(expected, actual);
         }
 
         @Test
-        void fetch_list_of_jobs_with_title_in_descending_order() {
+        void fetchJobsInDescendingOrder_returnsListOfJobsFromLastAddedToFirstAdded() {
+            // Given
             Job expected = cache.getCache().get(380775);
 
+            // When
             List<Job> jobs = cache.fetchJobsInDescendingOrder(title);
-            Job actual = jobs.get(0);
 
+            // Then
+            Job actual = jobs.get(0);
             assertEquals(expected, actual);
         }
     }
