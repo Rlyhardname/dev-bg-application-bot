@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class HttpClientFacade implements Destructor {
+
     public static final Logger logger = Logger.getLogger(HttpClientFacade.class.getName());
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final FileHandler fileHandler;
@@ -52,6 +53,9 @@ public class HttpClientFacade implements Destructor {
 
     }
 
+    /**
+     * Used in finallis e
+     */
     @Override
     public void tearDown() {
         logger.log(Level.INFO, "HttpClient teardown at: " + LocalDateTime.now());

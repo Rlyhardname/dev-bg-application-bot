@@ -1,6 +1,6 @@
 package com.dimitrovsolutions.cache;
 
-import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.io.files.JobFileSystemHandler;
 import com.dimitrovsolutions.model.Job;
 
 import java.util.HashMap;
@@ -23,11 +23,11 @@ public class LoaderCache extends Cache {
     }
 
     public void loadEntries() {
-        JobLoader.loadJobs(getCache());
+        JobFileSystemHandler.loadJobs(getCache());
     }
 
     @Override
-    public void saveEntry(int id, Job job) {
-        throw new UnsupportedOperationException();
+    public boolean containsJobId(int jobId) {
+        return getCache().containsKey(jobId);
     }
 }

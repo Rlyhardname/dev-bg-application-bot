@@ -15,14 +15,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class JobLoader {
-    private static final FileHandler fileHandler;
-    private static final Logger logger = Logger.getLogger(JobLoader.class.getName());
-    private static final String LOG_DIRECTORY = "src/main/resources/logs/job_loader.log";
+/**
+ * Util responsible for loading jobs from text file to alreadyApplied cache and saving
+ * new jobs not already applied to from the jobs cache to the file system.
+ */
+public class JobFileSystemHandler {
+
     private static final String CACHE_DIRECTORY = "src/main/resources/cache/cache.txt";
     private static final String PERSISTENCE_FAILURE = "Application write to file failed - err: %s";
     private static final String LOAD_ERROR = "Cache load failure - err: %s";
 
+    private static final FileHandler fileHandler;
+    private static final Logger logger = Logger.getLogger(JobFileSystemHandler.class.getName());
+    private static final String LOG_DIRECTORY = "src/main/resources/logs/job_loader.log";
 
     static {
         try {
@@ -34,9 +39,11 @@ public class JobLoader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Loads jobs from filesystem to alreadyAppliedCache at startup up usually.
+     */
     public static void loadJobs(Map<Integer, Job> alreadyAppliedCache) {
         try (BufferedReader br = Files.newBufferedReader(Path.of(CACHE_DIRECTORY))) {
             while (true) {
@@ -55,6 +62,9 @@ public class JobLoader {
         }
     }
 
+    /**
+     * Saves most recently applied jobs from jobsCache to fileSystem.
+     */
     public static void saveJobToFile(int id, Job job) {
         try (BufferedWriter bw = Files.newBufferedWriter(Path.of(CACHE_DIRECTORY), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             String line = String.join("|", String.valueOf(id), job.title(), job.url(), String.valueOf(job.localDate()));
@@ -68,10 +78,12 @@ public class JobLoader {
         }
     }
 
+    /**
+     * Used in finally method of Orchestrator
+     */
     public static void tearDown() {
         if (fileHandler != null) {
             fileHandler.close();
         }
     }
-
 }

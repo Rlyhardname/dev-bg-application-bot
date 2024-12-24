@@ -57,6 +57,5 @@ public class ConfigurableTest {
             assert driver != null;
             driver.quit();
         }
-
     }
 }

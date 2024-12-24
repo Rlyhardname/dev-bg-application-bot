@@ -1,6 +1,6 @@
 package com.dimitrovsolutions.cache;
 
-import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.io.files.JobFileSystemHandler;
 import com.dimitrovsolutions.model.Job;
 
 import java.util.HashMap;
@@ -19,13 +19,12 @@ public class PersistenceCache extends Cache {
         super(new HashMap<>());
     }
 
-    @Override
-    public void loadEntries() {
-        throw new UnsupportedOperationException();
+    public void saveEntry(int id, Job job) {
+        JobFileSystemHandler.saveJobToFile(id, job);
     }
 
     @Override
-    public void saveEntry(int id, Job job) {
-        JobLoader.saveJobToFile(id, job);
+    public boolean containsJobId(int jobId) {
+        return getCache().containsKey(jobId);
     }
 }

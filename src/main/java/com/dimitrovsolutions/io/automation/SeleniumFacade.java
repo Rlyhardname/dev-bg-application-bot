@@ -3,7 +3,7 @@ package com.dimitrovsolutions.io.automation;
 import com.dimitrovsolutions.cache.Cache;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.driver.DriverConfigurations;
-import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.io.files.JobFileSystemHandler;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
 import com.dimitrovsolutions.model.Job;
 import com.dimitrovsolutions.model.NavigationConfig;
@@ -104,7 +104,7 @@ public class SeleniumFacade implements Destructor {
 
                     logPageContentAfterSendingApplication(client);
                     // Should save if application doesn't fail
-                    JobLoader.saveJobToFile(entry.getKey(), job);
+                    JobFileSystemHandler.saveJobToFile(entry.getKey(), job);
                     Thread.sleep(6 * 1000 * 60);
                 } else {
                     logger.log(Level.INFO, "Application complete for job" + entry.getKey() + " " + job);

@@ -17,21 +17,8 @@ public class CacheTest {
     void cache_constructor_throws_NullPointerException() {
         var expected = NullPointerException.class;
 
-
         assertThrows(expected, () -> new PersistenceCache(null));
         assertThrows(expected, () -> new LoaderCache(null));
-        assertThrows(expected, () -> new Cache(null) {
-            @Override
-            public void loadEntries() {
-
-            }
-
-            @Override
-            public void saveEntry(int id, Job job) {
-
-            }
-        });
-
     }
 
     @Test
@@ -50,7 +37,7 @@ public class CacheTest {
 
         @BeforeAll
         static void setup() {
-            cache = new Cache(Map.of(
+            cache = new LoaderCache(Map.of(
                     374531, new Job(
                             "SAP iXp Intern – Backend Developer for Cloud Transformation XSA team",
                             "https://dev.bg/company/jobads/sap-ixp-intern-backend-developer-for-cloud-transformation-xsa-team/",
@@ -63,18 +50,7 @@ public class CacheTest {
                             "Beginner Java/Kotlin Developer",
                             "https://dev.bg/company/jobads/markovski-solutions-beginner-java-kotlin-developer/",
                             LocalDateTime.now())
-            )) {
-                @Override
-                public void loadEntries() {
-
-                }
-
-                @Override
-                public void saveEntry(int id, Job job) {
-
-                }
-            };
-
+            ));
         }
 
         @Test
@@ -96,7 +72,5 @@ public class CacheTest {
 
             assertEquals(expected, actual);
         }
-
     }
-
 }

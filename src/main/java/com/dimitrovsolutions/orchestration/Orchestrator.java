@@ -3,8 +3,8 @@ package com.dimitrovsolutions.orchestration;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.SeleniumFacade;
 import com.dimitrovsolutions.context.Context;
-import com.dimitrovsolutions.io.html.Mapper;
-import com.dimitrovsolutions.io.files.JobLoader;
+import com.dimitrovsolutions.io.html.DocumentScraper;
+import com.dimitrovsolutions.io.files.JobFileSystemHandler;
 import com.dimitrovsolutions.model.NavigationConfig;
 import org.jsoup.Jsoup;
 
@@ -65,7 +65,7 @@ public class Orchestrator implements Destructor {
 
         print("BODY " + body);
 
-        Mapper.toMap(context);
+        DocumentScraper.traverseDocumentAndAddNewJobsToJobsCache(context);
     }
 
     private static void print(String htmlResponseBody) {
@@ -76,8 +76,8 @@ public class Orchestrator implements Destructor {
         tearDown();
 
         context.tearDown();
-        Mapper.tearDown();
-        JobLoader.tearDown();
+        DocumentScraper.tearDown();
+        JobFileSystemHandler.tearDown();
     }
 
     public Context getContext() {

@@ -6,6 +6,7 @@ import com.dimitrovsolutions.cache.PersistenceCache;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.SeleniumFacade;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
+import com.dimitrovsolutions.model.Job;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -84,11 +85,15 @@ public class Context implements Destructor {
         return jobsCache;
     }
 
+    public void tryAddJobToJobsCache(int jobId, Job job) {
+        jobsCache.putIfAbsent(jobId, job);
+    }
+
     /**
      * Gets preloaded on start Cache Object with all previously applied to jobs.
      */
-    public Cache getAlreadyAppliedCache() {
-        return alreadyAppliedCache;
+    public LoaderCache getAlreadyAppliedCache() {
+        return (LoaderCache) alreadyAppliedCache;
     }
 
     /**
