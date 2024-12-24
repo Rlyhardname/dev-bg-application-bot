@@ -15,8 +15,8 @@ public abstract class Cache {
     private final Map<Integer, Job> cache;
 
     public Cache(Map<Integer, Job> cache) {
-        if (cache == null) {
-            throw new NullPointerException();
+        if(cache == null){
+            throw new IllegalArgumentException("Cache cannot be null");
         }
 
         this.cache = cache;
