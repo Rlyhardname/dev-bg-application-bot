@@ -3,6 +3,8 @@ package com.dimitrovsolutions.io.automation.driver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.nio.file.Paths;
+
 /**
  * Predefined Chrome browser configuration for SeleniumFacade script.
  */
@@ -24,7 +26,8 @@ public class ChromeConfigurations implements Configurable {
      */
     @Override
     public void setProperties() {
-        System.setProperty("webdriver.chrome.driver", "../resources/drivers/chromedriver.exe");
+        String driverPath = Paths.get("src", "main", "resources", "drivers", "chromedriver.exe").toAbsolutePath().toString();
+        System.setProperty("webdriver.chrome.driver", driverPath);
     }
 
     /**

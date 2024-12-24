@@ -5,6 +5,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * Predefined firefox browser configuration for selenium
@@ -53,7 +54,8 @@ public class FirefoxConfiguration implements Configurable {
      */
     @Override
     public void setProperties() {
-        System.setProperty("webdriver.gecko.driver", "../resources/drivers/geckodriver.exe");
+        String driverPath = Paths.get("src", "main", "resources", "drivers", "geckodriver.exe").toAbsolutePath().toString();
+        System.setProperty("webdriver.gecko.driver", driverPath);
     }
 
     /**
