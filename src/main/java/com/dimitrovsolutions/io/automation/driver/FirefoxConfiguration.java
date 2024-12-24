@@ -10,10 +10,12 @@ import java.io.File;
  * Predefined firefox browser configuration for selenium
  */
 public class FirefoxConfiguration implements Configurable {
-    private final FirefoxOptions firefoxOptions;
+
     private static String FIREFOX_EXE_PATH = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     private static String firefox_profile_name = "Placeholder profile";
     private static String FIREFOX_PROFILE_SRC = "C:\\Users\\batba\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\" + firefox_profile_name;
+
+    private final FirefoxOptions firefoxOptions;
 
     public FirefoxConfiguration() {
         setProperties();

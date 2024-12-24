@@ -11,6 +11,7 @@ import java.util.Map;
  * and PersistenceCache - responsible for saving scrapped entries to file system.
  */
 public abstract class Cache {
+
     private final Map<Integer, Job> cache;
 
     public Cache(Map<Integer, Job> cache) {

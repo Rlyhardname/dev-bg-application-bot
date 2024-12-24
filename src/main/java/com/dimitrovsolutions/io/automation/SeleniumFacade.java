@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class SeleniumFacade implements Destructor {
+
     private static final Logger logger = Logger.getLogger(SeleniumFacade.class.getName());
     private static FileHandler fileHandler;
     private static String id;

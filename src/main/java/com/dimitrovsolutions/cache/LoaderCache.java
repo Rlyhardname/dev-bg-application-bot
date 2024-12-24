@@ -11,6 +11,7 @@ import java.util.Map;
  * in memory Map
  */
 public class LoaderCache extends Cache {
+
     public LoaderCache(Map<Integer, Job> cache) {
         super(cache);
         loadEntries();

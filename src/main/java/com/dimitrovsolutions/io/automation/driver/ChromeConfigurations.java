@@ -7,8 +7,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
  * Predefined Chrome browser configuration for SeleniumFacade script.
  */
 public class ChromeConfigurations implements Configurable {
-    ChromeOptions chromeOptions;
+
     private static String CHROME_EXE_PATH= "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+
+    private final ChromeOptions chromeOptions;
 
     public ChromeConfigurations() {
         setProperties();

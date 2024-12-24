@@ -21,12 +21,17 @@ import java.util.logging.SimpleFormatter;
  * passing the Context itself as a dependency
  */
 public class Context implements Destructor {
+
     private static final Logger logger = Logger.getLogger(Context.class.getName());
     private final FileHandler fileHandler;
+
     private final HttpClientFacade client = new HttpClientFacade();
+
     private final Cache alreadyAppliedCache = new LoaderCache();
     private final Cache jobsCache = new PersistenceCache();
+
     private final SeleniumFacade seleniumFacade;
+
     private Document document;
 
     public Context(SeleniumFacade seleniumFacade) {
