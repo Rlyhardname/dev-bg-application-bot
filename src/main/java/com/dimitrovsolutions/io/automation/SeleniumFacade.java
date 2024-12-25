@@ -112,7 +112,6 @@ public class SeleniumFacade implements Destructor {
 
                 clickComboBox();
 
-                Thread.sleep(60000);
                 clickSecondApplicationButton();
 
                 if (isPageUrlSame(job.url())) {
@@ -120,11 +119,10 @@ public class SeleniumFacade implements Destructor {
 
                     logPageContentAfterSendingApplication(client);
                     // Should save if application doesn't fail
+                    logger.log(Level.INFO, "saving job " + entry.getKey() + " " + job);
                     jobsCache.saveEntry(entry.getKey(), job);
-                    Thread.sleep(6 * 1000 * 60);
                 } else {
-                    logger.log(Level.INFO, "Application complete for job" + entry.getKey() + " " + job);
-                    Thread.sleep(6 * 1000 * 60);
+                    logger.log(Level.INFO, "redirected on job " + entry.getKey() + " " + job);
                 }
 
             }
