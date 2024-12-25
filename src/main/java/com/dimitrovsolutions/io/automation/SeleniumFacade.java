@@ -41,7 +41,7 @@ public class SeleniumFacade implements Destructor {
     private static String value;
     private static String path;
 
-    private final WebDriver driver;
+    private WebDriver driver;
     private final NavigationConfig navigationConfig;
 
     /**
@@ -74,16 +74,15 @@ public class SeleniumFacade implements Destructor {
         }
     }
 
-    public SeleniumFacade(NavigationConfig navigationConfig, String browser) {
+    public SeleniumFacade(NavigationConfig navigationConfig) {
         this.navigationConfig = navigationConfig;
-        driver = initDriver(browser);
     }
 
     /**
      * Creates a webdriver based on browser chosen and opens an instance of the browser.
      */
-    private WebDriver initDriver(String browser) {
-        return switch (browser.toLowerCase()) {
+    public void initDriver(String browser) {
+        driver = switch (browser.toLowerCase()) {
             case "firefox" -> DriverConfigurations.firefoxConfiguration().getDriver();
             case "chrome" -> DriverConfigurations.chromeConfiguration().getDriver();
             default -> throw new IllegalStateException("Unexpected value: " + browser.toLowerCase());

@@ -24,19 +24,9 @@ import java.util.logging.SimpleFormatter;
 public class Context implements Destructor {
 
     private static final Logger logger = Logger.getLogger(Context.class.getName());
-    private final FileHandler fileHandler;
+    private static final FileHandler fileHandler;
 
-    private final HttpClientFacade client = new HttpClientFacade();
-
-    private final LoaderCache alreadyAppliedCache = new LoaderCache();
-    private final PersistenceCache jobsCache = new PersistenceCache();
-
-    private final SeleniumFacade seleniumFacade;
-
-    private Document document;
-
-    public Context(SeleniumFacade seleniumFacade) {
-        this.seleniumFacade = seleniumFacade;
+    static {
         try {
             fileHandler = new FileHandler("src/main/resources/logs/context.log", true);
             fileHandler.setFormatter(new SimpleFormatter());
@@ -48,6 +38,22 @@ public class Context implements Destructor {
             logger.log(Level.SEVERE, "Already send applications file didn't load");
             throw new RuntimeException(e);
         }
+    }
+
+    private final HttpClientFacade client = new HttpClientFacade();
+
+    private final LoaderCache alreadyAppliedCache = new LoaderCache();
+    private final PersistenceCache jobsCache = new PersistenceCache();
+
+    private SeleniumFacade seleniumFacade;
+
+    private Document document;
+
+    public Context() {
+    }
+
+    public void setSeleniumFacade(SeleniumFacade seleniumFacade) {
+        this.seleniumFacade = seleniumFacade;
     }
 
     /**
@@ -85,6 +91,10 @@ public class Context implements Destructor {
         return jobsCache;
     }
 
+    public boolean hasNewJobs() {
+        return getJobsCache().size() > 0;
+    }
+
     public void tryAddJobToJobsCache(int jobId, Job job) {
         jobsCache.putIfAbsent(jobId, job);
     }
@@ -110,6 +120,13 @@ public class Context implements Destructor {
         if (seleniumFacade != null) {
             seleniumFacade.quitDriver();
         }
+    }
+
+    /**
+     * Initializes webdriver which opens up a new browser window
+     */
+    public void initWebDriver(String browser) {
+        seleniumFacade.initDriver(browser);
     }
 
     /**

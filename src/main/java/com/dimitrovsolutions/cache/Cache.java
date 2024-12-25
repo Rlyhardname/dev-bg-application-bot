@@ -58,6 +58,10 @@ public abstract class Cache {
         getCache().putIfAbsent(jobId, job);
     }
 
+    public int size(){
+        return cache.size();
+    }
+
     /**
      * Prints the current jobs cache on the console.
      */

@@ -21,41 +21,54 @@ import java.util.logging.SimpleFormatter;
  * The class responsible for the complete flow of the application
  */
 public class Orchestrator implements Destructor {
-    private static Orchestrator orchestrator;
+
+    public static final String BROWSER = "chrome";
+
+    private static volatile Orchestrator orchestrator;
+
     private final Context context;
-    private final FileHandler fileHandler;
+
+    private static final FileHandler fileHandler;
     private static final Logger logger = Logger.getLogger(Orchestrator.class.getName());
     private static final String LOG_DIRECTORY = "src/main/resources/logs/orchestrator.log";
 
-    public static Context start(NavigationConfig navigationConfig) {
+    static {
+        try {
+            fileHandler = new FileHandler(LOG_DIRECTORY, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileHandler.setFormatter(new SimpleFormatter());
+    }
+
+    public static synchronized void start(NavigationConfig navigationConfig) {
         if (orchestrator == null) {
             orchestrator = new Orchestrator(navigationConfig);
+            orchestrator.tearDown();
         }
-
-        return orchestrator.getContext();
     }
 
     private Orchestrator(NavigationConfig navigationConfig) {
-        this.context = new Context(new SeleniumFacade(navigationConfig, "chrome"));
+        this.context = new Context();
 
         try {
-            fileHandler = new FileHandler(LOG_DIRECTORY, true);
-            fileHandler.setFormatter(new SimpleFormatter());
-
             logger.addHandler(fileHandler);
             logger.setLevel(Level.ALL);
             logger.log(Level.INFO, "Application started at: " + LocalDateTime.now());
 
             sendHttpRequestParseResponseScrapeDataIntoJobsCache(navigationConfig.scrapePageUrl());
 
-            context.runSelenium();
-        } catch (InterruptedException | IOException e) {
+            if (context.hasNewJobs()) {
+                context.setSeleniumFacade(new SeleniumFacade(navigationConfig));
+                context.initWebDriver(BROWSER);
+                context.runSelenium();
+            }
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             logger.log(Level.INFO, "Application closing without errors: " + LocalDateTime.now());
             tearDownFileHandlers();
         }
-
     }
 
     /**
@@ -79,14 +92,14 @@ public class Orchestrator implements Destructor {
     /**
      * Build httpRequest for the provided url
      */
-    private HttpRequest targetedPageForWebScrapping(String url){
+    private HttpRequest targetedPageForWebScrapping(String url) {
         return context.getClient().getRequest(url);
     }
 
     /**
      * send async request and on receiving response returns HttpResponse for the scrapper to handle
      */
-    private HttpResponse<String> sendRequestReturnHttpResponse (HttpRequest request){
+    private HttpResponse<String> sendRequestReturnHttpResponse(HttpRequest request) {
         return context.getClient().send(request);
     }
 
@@ -101,22 +114,16 @@ public class Orchestrator implements Destructor {
      * Teardown used in finally block of Orchestrator.
      */
     public void tearDownFileHandlers() {
-        tearDown();
-
         context.tearDown();
         DocumentScraper.tearDown();
         JobFileSystemHandler.tearDown();
     }
 
-    public Context getContext() {
-        return context;
-    }
-
     /**
      * Tear down log related file handler and log event.
      */
-    @Override
-    public void tearDown() {
+
+    public synchronized void tearDown() {
         logger.log(Level.INFO, "Application logger tear down at: " + LocalDateTime.now());
 
         if (fileHandler != null) {
@@ -126,6 +133,5 @@ public class Orchestrator implements Destructor {
         if (orchestrator != null) {
             orchestrator = null;
         }
-
     }
 }
