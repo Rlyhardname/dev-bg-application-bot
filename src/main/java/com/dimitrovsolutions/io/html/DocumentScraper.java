@@ -49,38 +49,39 @@ public class DocumentScraper {
 
         try {
             // DIV with JOB ID
-            Elements jobsIds = getElementsByCssQuery(context.getDocument(), "div[data-job-id]");
+            Elements jobListingsElements = getElementsByCssQuery(context.getDocument(), "div[data-job-id]");
 
-            for (Element el : jobsIds) {
-                Attributes attributes = el.attributes();
+            for (Element currentElement : jobListingsElements) {
+                Attributes classNameAndId = currentElement.attributes();
                 // JOB ID for map
-                Integer jobId = Integer.parseInt(attributes.attribute("data-job-id").getValue());
-                var child1 = el.children().get(1);
+                int jobId = Integer.parseInt(classNameAndId.attribute("data-job-id").getValue());
+                var rootElement = currentElement.children().get(1);
                 //System.out.println("CHILD 1 val: " + child1.attributes().asList().get(0).getValue());
-                var child2 = child1.children().get(2);
+                var rootElementChild = rootElement.children().get(2);
                 //System.out.println("CHILD 2 val: " + child2.attributes().asList().get(0).getValue());
-                var child3 = child2.children().get(0);
-                //System.out.println("CHILD 3 val: " + child3.text());
-                String title = child3.text();
+                var classNameListingTitle = rootElementChild.children().get(0);
+                //System.out.println("CHILD 3 val: " + rootElementChildsChild.text());
+                String listingTitle = classNameListingTitle.text();
 
                 // inner div, then inner <a> tag
-                Element child = el.firstElementChild();
-                if (child == null) {
+                Element divContainingUrlAndIcon = currentElement.firstElementChild();
+                if (divContainingUrlAndIcon == null) {
                     logger.log(Level.INFO, HTML_STRUCTURE_CHANGE);
                     continue;
                 }
 
-                child = child.firstElementChild();
-                if (child == null) {
+                // Reuse element traverse to Url
+                divContainingUrlAndIcon = divContainingUrlAndIcon.firstElementChild();
+                if (divContainingUrlAndIcon == null) {
                     logger.log(Level.INFO, HTML_STRUCTURE_CHANGE);
                     continue;
                 }
 
-                Attributes attributes1 = child.attributes();
-                Attribute linkAttribute = attributes1.attribute("href");
-                String jobUrl = linkAttribute.getValue();
-                if (isTitleAndUrlValid(title, jobUrl)) {
-                    Job job = new Job(title, jobUrl, LocalDateTime.now());
+                Attributes urlAndClassName = divContainingUrlAndIcon.attributes();
+                Attribute linkAttribute = urlAndClassName.attribute("href");
+                String listingUrl = linkAttribute.getValue();
+                if (isTitleAndUrlValid(listingTitle, listingUrl)) {
+                    Job job = new Job(listingTitle, listingUrl, LocalDateTime.now());
 
                     // TODO this line might be useless or harmful, write tests
                     if (context.getAlreadyAppliedCache().containsJobId(jobId)) {
