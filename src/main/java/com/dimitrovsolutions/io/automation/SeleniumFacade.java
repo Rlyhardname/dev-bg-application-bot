@@ -1,11 +1,12 @@
 package com.dimitrovsolutions.io.automation;
 
-import com.dimitrovsolutions.cache.PersistenceCache;
+import com.dimitrovsolutions.cache.JobListings;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.driver.DriverConfigurations;
 import com.dimitrovsolutions.io.network.HttpClientFacade;
 import com.dimitrovsolutions.model.Job;
 import com.dimitrovsolutions.model.NavigationConfig;
+import com.dimitrovsolutions.util.LoggerUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -24,10 +25,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import static com.dimitrovsolutions.config.DirectoryConfig.WORKING_DIRECTORY;
+import static com.dimitrovsolutions.util.LoggerUtil.hasNoHandlers;
+import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 
 /**
  * Wrapper for selenium, exposing just the functionality it will produce
@@ -35,7 +38,7 @@ import java.util.logging.SimpleFormatter;
 public class SeleniumFacade implements Destructor {
 
     private static final Logger logger = Logger.getLogger(SeleniumFacade.class.getName());
-    private static FileHandler fileHandler;
+    public static final String SELENIUM_LOGGER_FILE_NAME = "/selenium.log";
 
     private static String id;
     private static String value;
@@ -48,33 +51,42 @@ public class SeleniumFacade implements Destructor {
      * Preloads login cookies from file into private static fields id,value and path. Sets log directory for log file.
      */
     static {
-        try (BufferedReader br = Files.newBufferedReader(Path.of("src/main/resources/cookies/cookie.txt").toAbsolutePath())) {
-            String LOG_DIRECTORY = "src/main/resources/logs/selenium.log";
-
-            fileHandler = new FileHandler(LOG_DIRECTORY, true);
-            fileHandler.setFormatter(new SimpleFormatter());
-
-            logger.addHandler(fileHandler);
-            logger.setLevel(Level.ALL);
-
-            List<String> cookieValues = new ArrayList<>();
-            String line = "";
-            do {
-                line = br.readLine();
-                cookieValues.add(line);
-            } while (line != null);
-
-            id = cookieValues.get(0);
-            value = cookieValues.get(1);
-            path = cookieValues.get(2);
-
-            logger.log(Level.INFO, "Selenium started at: " + LocalDateTime.now());
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Startup error " + e.getMessage());
+        try (BufferedReader br = Files.newBufferedReader(Path.of(
+                WORKING_DIRECTORY + "/cookies/cookie.txt").toAbsolutePath())) {
+            initLogger(logger, Level.ALL, SELENIUM_LOGGER_FILE_NAME);
+            initCookies(br);
+        } catch (
+                IOException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
+    private static void initCookies(BufferedReader br) {
+        List<String> cookieValues = new ArrayList<>();
+        String line = "";
+        do {
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Profile cookies failed to load.. " + e.getMessage());
+                throw new RuntimeException(e);
+            }
+
+            cookieValues.add(line);
+        } while (line != null);
+
+        id = cookieValues.get(0);
+        value = cookieValues.get(1);
+        path = cookieValues.get(2);
+    }
+
     public SeleniumFacade(NavigationConfig navigationConfig) {
+        if (hasNoHandlers(logger)) {
+            initLogger(logger, Level.ALL, SELENIUM_LOGGER_FILE_NAME);
+        }
+
+        logger.log(Level.INFO, "Selenium started at: " + LocalDateTime.now());
         this.navigationConfig = navigationConfig;
     }
 
@@ -92,7 +104,8 @@ public class SeleniumFacade implements Destructor {
     /**
      * Selenium script complete flow block.
      */
-    public void runScript(HttpClientFacade client, PersistenceCache jobsCache) throws InterruptedException {
+    public void runScript(HttpClientFacade client, JobListings jobListings) throws InterruptedException {
+        System.out.println("enter");
         configureDriver();
 
         navigateToLandingPage();
@@ -102,7 +115,7 @@ public class SeleniumFacade implements Destructor {
         navigateToJobs();
 
         try {
-            for (Map.Entry<Integer, Job> entry : jobsCache.getCache().entrySet()) {
+            for (Map.Entry<Integer, Job> entry : jobListings.getCache().entrySet()) {
                 Job job = openJobListing(entry.getValue());
 
                 clickFirstApplicationButton();
@@ -119,7 +132,7 @@ public class SeleniumFacade implements Destructor {
                     logPageContentAfterSendingApplication(client);
                     // Should save if application doesn't fail
                     logger.log(Level.INFO, "saving job " + entry.getKey() + " " + job);
-                    jobsCache.saveEntry(entry.getKey(), job);
+                    jobListings.saveEntry(entry.getKey(), job);
                 } else {
                     logger.log(Level.INFO, "redirected on job " + entry.getKey() + " " + job);
                 }
@@ -156,7 +169,7 @@ public class SeleniumFacade implements Destructor {
         try {
             driver.manage().addCookie(new Cookie(id, value, path));
         } catch (IllegalArgumentException e) {
-            logger.log(Level.SEVERE, "Login cookies didn't load... Exit application");
+            logger.log(Level.SEVERE, "Login cookies corrupted... Exit application");
             throw new IllegalArgumentException();
         }
     }
@@ -264,9 +277,6 @@ public class SeleniumFacade implements Destructor {
     @Override
     public void tearDown() {
         logger.log(Level.INFO, "Selenium logger teardown at: " + LocalDateTime.now());
-
-        if (fileHandler != null) {
-            fileHandler.close();
-        }
+        LoggerUtil.tearDown(logger);
     }
 }

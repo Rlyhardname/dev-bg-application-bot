@@ -1,44 +1,39 @@
 package com.dimitrovsolutions.orchestration;
 
+import com.dimitrovsolutions.context.Context;
 import com.dimitrovsolutions.io.Destructor;
 import com.dimitrovsolutions.io.automation.SeleniumFacade;
-import com.dimitrovsolutions.context.Context;
-import com.dimitrovsolutions.io.html.DocumentScraper;
 import com.dimitrovsolutions.io.files.JobFileSystemHandler;
+import com.dimitrovsolutions.io.html.DocumentScraper;
 import com.dimitrovsolutions.model.NavigationConfig;
+import com.dimitrovsolutions.util.LoggerUtil;
 import org.jsoup.Jsoup;
 
-import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import static com.dimitrovsolutions.util.LoggerUtil.hasNoHandlers;
+import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 
 /**
  * The class responsible for the complete flow of the application
  */
 public class Orchestrator implements Destructor {
 
-    public static final String BROWSER = "chrome";
+    private static final String BROWSER = "chrome";
 
     private static volatile Orchestrator orchestrator;
 
     private final Context context;
 
-    private static final FileHandler fileHandler;
     private static final Logger logger = Logger.getLogger(Orchestrator.class.getName());
-    private static final String LOG_DIRECTORY = "src/main/resources/logs/orchestrator.log";
+    private static final String ORCHESTRATOR_FILE_NAME = "/orchestrator.log";
 
     static {
-        try {
-            fileHandler = new FileHandler(LOG_DIRECTORY, true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        fileHandler.setFormatter(new SimpleFormatter());
+        initLogger(logger, Level.ALL, ORCHESTRATOR_FILE_NAME);
     }
 
     public static synchronized void start(NavigationConfig navigationConfig) {
@@ -49,11 +44,12 @@ public class Orchestrator implements Destructor {
     }
 
     private Orchestrator(NavigationConfig navigationConfig) {
-        this.context = new Context();
+        if (hasNoHandlers(logger)) {
+            initLogger(logger, Level.ALL, ORCHESTRATOR_FILE_NAME);
+        }
 
+        context = new Context();
         try {
-            logger.addHandler(fileHandler);
-            logger.setLevel(Level.ALL);
             logger.log(Level.INFO, "Application started at: " + LocalDateTime.now());
 
             sendHttpRequestParseResponseScrapeDataIntoJobsCache(navigationConfig.scrapePageUrl());
@@ -64,6 +60,7 @@ public class Orchestrator implements Destructor {
                 context.runSelenium();
             }
         } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
             throw new RuntimeException(e);
         } finally {
             logger.log(Level.INFO, "Application closing without errors: " + LocalDateTime.now());
@@ -84,7 +81,7 @@ public class Orchestrator implements Destructor {
 
         context.setDocument(Jsoup.parse(stringRepresentationOfDocBody));
 
-        print("BODY " + stringRepresentationOfDocBody);
+        //print("BODY " + stringRepresentationOfDocBody);
 
         DocumentScraper.traverseDocumentAndAddNewJobsToJobsCache(context);
     }
@@ -104,6 +101,16 @@ public class Orchestrator implements Destructor {
     }
 
     /**
+     * Teardown used in finally block of Orchestrator.
+     */
+    public void tearDownFileHandlers() {
+        context.tearDown();
+        context.closeSelenium();
+        DocumentScraper.tearDown();
+        JobFileSystemHandler.tearDown();
+    }
+
+    /**
      * Print String representation of response body into the command line.
      */
     private static void print(String htmlResponseBody) {
@@ -111,24 +118,11 @@ public class Orchestrator implements Destructor {
     }
 
     /**
-     * Teardown used in finally block of Orchestrator.
-     */
-    public void tearDownFileHandlers() {
-        context.tearDown();
-        DocumentScraper.tearDown();
-        JobFileSystemHandler.tearDown();
-    }
-
-    /**
      * Tear down log related file handler and log event.
      */
-
     public synchronized void tearDown() {
         logger.log(Level.INFO, "Application logger tear down at: " + LocalDateTime.now());
-
-        if (fileHandler != null) {
-            fileHandler.close();
-        }
+        LoggerUtil.tearDown(logger);
 
         if (orchestrator != null) {
             orchestrator = null;

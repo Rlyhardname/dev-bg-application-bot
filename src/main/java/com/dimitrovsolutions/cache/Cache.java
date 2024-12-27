@@ -15,7 +15,7 @@ public abstract class Cache {
     private final Map<Integer, Job> cache;
 
     public Cache(Map<Integer, Job> cache) {
-        if(cache == null){
+        if (cache == null) {
             throw new IllegalArgumentException("Cache cannot be null");
         }
 
@@ -55,10 +55,10 @@ public abstract class Cache {
     }
 
     public void putIfAbsent(int jobId, Job job) {
-        getCache().putIfAbsent(jobId, job);
+        cache.putIfAbsent(jobId, job);
     }
 
-    public int size(){
+    public int size() {
         return cache.size();
     }
 

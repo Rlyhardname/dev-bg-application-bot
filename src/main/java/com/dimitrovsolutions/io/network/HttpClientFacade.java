@@ -1,42 +1,37 @@
 package com.dimitrovsolutions.io.network;
 
 import com.dimitrovsolutions.io.Destructor;
+import com.dimitrovsolutions.util.LoggerUtil;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import static com.dimitrovsolutions.util.LoggerUtil.hasNoHandlers;
+import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 
 /**
  * HttpClientWrapper abstracting HttpClient and corresponding Logger creation, exposing just
  * needed http methods.
  */
-public class HttpClientFacade implements Destructor {
+public class HttpClientFacade implements Destructor{
 
-    public static final Logger logger = Logger.getLogger(HttpClientFacade.class.getName());
+    private static final Logger logger = Logger.getLogger(HttpClientFacade.class.getName());
+    private static final String HTTP_CLIENT_LOGGER_FILE_NAME = "/http_client.log";
+
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final FileHandler fileHandler;
 
     public HttpClientFacade() {
-        try {
-            String LOG_DIRECTORY = "E:\\jobsCache\\httpLog.txt";
-
-            this.fileHandler = new FileHandler(LOG_DIRECTORY, true);
-            fileHandler.setFormatter(new SimpleFormatter());
-
-            logger.addHandler(fileHandler);
-            logger.setLevel(Level.ALL);
-            logger.log(Level.INFO, "HttpClient logger start at: " + LocalDateTime.now());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (hasNoHandlers(logger)) {
+            initLogger(logger, Level.ALL, HTTP_CLIENT_LOGGER_FILE_NAME);
         }
+
+        logger.log(Level.INFO, "HttpClient logger start at: " + LocalDateTime.now());
     }
 
     /**
@@ -69,9 +64,6 @@ public class HttpClientFacade implements Destructor {
     @Override
     public void tearDown() {
         logger.log(Level.INFO, "HttpClient teardown at: " + LocalDateTime.now());
-
-        if (fileHandler != null) {
-            fileHandler.close();
-        }
+        LoggerUtil.tearDown(logger);
     }
 }
