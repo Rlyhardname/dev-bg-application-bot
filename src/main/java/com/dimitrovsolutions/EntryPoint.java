@@ -17,7 +17,7 @@ public class EntryPoint {
 
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final int INITIAL_DELAY_IN_TIME_UNITS = 1;
-    private static final int REPEAT_PERIOD_IN_TIME_UNITS = 15;
+    private static final int REPEAT_PERIOD_IN_TIME_UNITS = 3600;
 
     public static void main(String[] args) {
         DirectoryConfig.initConfig();

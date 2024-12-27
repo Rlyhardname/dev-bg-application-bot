@@ -30,14 +30,6 @@ public class DirectoryConfig {
 
     /**
      * Run the application once so a directory gets created.<pre>
-     * Add chromedriver.exe for chrome browser
-     * Add geckodriver.exe for firefox browser
-     * </pre>
-     */
-    public static final String DRIVERS_PATH = "/drivers";
-
-    /**
-     * Run the application once so a directory gets created.<pre>
      * Create cache.txt in directory.
      * /pre>
      */
@@ -47,7 +39,6 @@ public class DirectoryConfig {
         try {
             Files.createDirectories(Paths.get(WORKING_DIRECTORY, LOGGER_PATH));
             Files.createDirectories(Paths.get(WORKING_DIRECTORY, COOKIES_PATH));
-            Files.createDirectories(Paths.get(WORKING_DIRECTORY, DRIVERS_PATH));
             Files.createDirectories(Paths.get(WORKING_DIRECTORY, CACHE_PATH));
         } catch (IOException e) {
             throw new RuntimeException(e);
