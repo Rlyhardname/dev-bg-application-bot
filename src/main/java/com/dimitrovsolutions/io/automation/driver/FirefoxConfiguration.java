@@ -17,7 +17,6 @@ import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
  */
 public class FirefoxConfiguration implements Configurable {
 
-    private static final String FIREFOX_EXE_PATH = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     private static final String FIREFOX_PROFILE_NAME = "Placeholder profile";
     private static final String FIREFOX_PROFILE_SRC = "C:\\Users\\batba\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\";
     private static final String FIREFOX_PROFILE_PATH = FIREFOX_PROFILE_SRC + FIREFOX_PROFILE_NAME;
@@ -42,8 +41,6 @@ public class FirefoxConfiguration implements Configurable {
         } catch (RuntimeException e) {
             logger.log(Level.SEVERE, "Firefox profile failed to initialize");
         }
-
-        firefoxOptions.setBinary(FIREFOX_EXE_PATH);
     }
 
     public FirefoxConfiguration(String profilePath, String binaryPath) {

@@ -15,8 +15,6 @@ import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
  */
 public class ChromeConfigurations implements Configurable {
 
-    private static final String CHROME_EXE_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-
     private static final Logger logger = Logger.getLogger(ChromeConfigurations.class.getName());
     private static final String DRIVER_CONFIGURATIONS_LOGGER_FILE_NAME = "/driver_configurations.log";
 
@@ -30,7 +28,6 @@ public class ChromeConfigurations implements Configurable {
         logger.log(Level.INFO, "Chrome configurations initialized");
 
         chromeOptions = new ChromeOptions();
-        chromeOptions.setBinary(CHROME_EXE_PATH);
     }
 
     /**
