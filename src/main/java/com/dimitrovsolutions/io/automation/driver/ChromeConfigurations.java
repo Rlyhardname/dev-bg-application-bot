@@ -4,11 +4,9 @@ import com.dimitrovsolutions.util.LoggerUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.dimitrovsolutions.config.DirectoryConfig.WORKING_DIRECTORY;
 import static com.dimitrovsolutions.util.LoggerUtil.hasNoHandlers;
 import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 
@@ -30,19 +28,9 @@ public class ChromeConfigurations implements Configurable {
         }
 
         logger.log(Level.INFO, "Chrome configurations initialized");
-        setProperties();
 
         chromeOptions = new ChromeOptions();
         chromeOptions.setBinary(CHROME_EXE_PATH);
-    }
-
-    /**
-     * Set webdriver for chrome to system property, used by ChromeOptions object.
-     */
-    @Override
-    public void setProperties() {
-        String driverPath = Paths.get(WORKING_DIRECTORY, "drivers", "chromedriver.exe").toAbsolutePath().toString();
-        System.setProperty("webdriver.chrome.driver", driverPath);
     }
 
     /**

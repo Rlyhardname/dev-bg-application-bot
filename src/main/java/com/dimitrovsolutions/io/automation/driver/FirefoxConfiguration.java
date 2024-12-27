@@ -6,11 +6,9 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.dimitrovsolutions.config.DirectoryConfig.WORKING_DIRECTORY;
 import static com.dimitrovsolutions.util.LoggerUtil.hasNoHandlers;
 import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 
@@ -36,8 +34,6 @@ public class FirefoxConfiguration implements Configurable {
 
         logger.log(Level.INFO, "Firefox Configurations logger initialized");
 
-        setProperties();
-
         firefoxOptions = new FirefoxOptions();
         FirefoxProfile firefoxProfile = null;
         try {
@@ -57,8 +53,6 @@ public class FirefoxConfiguration implements Configurable {
 
         logger.log(Level.INFO, "Firefox Configurations logger initialized");
 
-        setProperties();
-
         firefoxOptions = new FirefoxOptions();
         FirefoxProfile firefoxProfile = null;
         try {
@@ -69,15 +63,6 @@ public class FirefoxConfiguration implements Configurable {
         }
 
         firefoxOptions.setBinary(binaryPath);
-    }
-
-    /**
-     * Set driver to system property, used by FireFoxOptions object
-     */
-    @Override
-    public void setProperties() {
-        String driverPath = Paths.get(WORKING_DIRECTORY, "drivers", "geckodriver.exe").toAbsolutePath().toString();
-        System.setProperty("webdriver.gecko.driver", driverPath);
     }
 
     /**
