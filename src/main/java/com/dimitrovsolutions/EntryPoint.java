@@ -18,22 +18,18 @@ public class EntryPoint {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final int INITIAL_DELAY_IN_TIME_UNITS = 1;
     private static final int REPEAT_PERIOD_IN_TIME_UNITS = 3600;
+    private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     public static void main(String[] args) {
         DirectoryConfig.initConfig();
 
         scheduler.scheduleAtFixedRate(() -> {
                     Orchestrator.start(new NavigationConfig(
-                            "https://dev.bg/company/jobs/java/?_seniority=intern",
-                            "https://dev.bg", new ArrayDeque<>(List.of(
-                            "https://dev.bg/company/jobs/",
-                            "https://dev.bg/company/jobs/java/",
-                            "https://dev.bg/company/jobs/java/?_seniority=intern"))
-                    ));
+                            "https://dev.bg/company/jobs/java/?_seniority=intern"));
                 },
                 INITIAL_DELAY_IN_TIME_UNITS,
                 REPEAT_PERIOD_IN_TIME_UNITS,
-                TimeUnit.SECONDS
+                TIME_UNIT
         );
     }
 }

@@ -38,7 +38,7 @@ public class NavigationConfig {
         return route;
     }
 
-    public String getScrapePageUrl() {
+    public String scrapePageUrl() {
         return scrapePageUrl;
     }
 }
