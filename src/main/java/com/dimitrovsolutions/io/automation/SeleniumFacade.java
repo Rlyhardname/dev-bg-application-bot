@@ -38,7 +38,10 @@ import static com.dimitrovsolutions.util.LoggerUtil.initLogger;
 public class SeleniumFacade implements Destructor {
 
     private static final Logger logger = Logger.getLogger(SeleniumFacade.class.getName());
-    public static final String SELENIUM_LOGGER_FILE_NAME = "/selenium.log";
+    private static final String SELENIUM_LOGGER_FILE_NAME = "/selenium.log";
+
+    private static final int DELAY_ONE_SECOND = 1000;
+    private static final int DELAY_ONE_AND_HALF_SECONDS = 1500;
 
     private static String id;
     private static String value;
@@ -105,7 +108,6 @@ public class SeleniumFacade implements Destructor {
      * Selenium script complete flow block.
      */
     public void runScript(HttpClientFacade client, JobListings jobListings) throws InterruptedException {
-        System.out.println("enter");
         configureDriver();
 
         navigateToLandingPage();
@@ -159,7 +161,7 @@ public class SeleniumFacade implements Destructor {
     private void navigateToLandingPage() throws InterruptedException {
         driver.get(navigationConfig.route().remove());
         addSessionCookie();
-        Thread.sleep(1500);
+        Thread.sleep(DELAY_ONE_SECOND);
     }
 
     /**
@@ -181,7 +183,7 @@ public class SeleniumFacade implements Destructor {
         String route;
         while ((route = navigationConfig.route().poll()) != null) {
             driver.get(route);
-            Thread.sleep(1000);
+            Thread.sleep(DELAY_ONE_SECOND);
         }
     }
 
@@ -194,7 +196,7 @@ public class SeleniumFacade implements Destructor {
             element.click();
         }
 
-        Thread.sleep(1500);
+        Thread.sleep(DELAY_ONE_AND_HALF_SECONDS);
     }
 
     /**
@@ -202,7 +204,7 @@ public class SeleniumFacade implements Destructor {
      */
     private Job openJobListing(Job job) throws InterruptedException {
         driver.get(job.url());
-        Thread.sleep(1000);
+        Thread.sleep(DELAY_ONE_SECOND);
 
         return job;
     }
@@ -213,7 +215,7 @@ public class SeleniumFacade implements Destructor {
     private void clickFirstApplicationButton() throws InterruptedException {
         WebElement apply = driver.findElement(By.className("single-job-apply-button"));
         apply.click();
-        Thread.sleep(1000);
+        Thread.sleep(DELAY_ONE_AND_HALF_SECONDS);
     }
 
     /**
