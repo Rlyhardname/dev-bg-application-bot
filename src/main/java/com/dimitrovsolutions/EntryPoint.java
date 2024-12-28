@@ -21,8 +21,6 @@ public class EntryPoint {
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     public static void main(String[] args) {
-        DirectoryConfig.initConfig();
-
         scheduler.scheduleAtFixedRate(() -> {
                     Orchestrator.start(new NavigationConfig(
                             "https://dev.bg/company/jobs/java/?_seniority=intern"));

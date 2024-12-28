@@ -31,7 +31,6 @@ public class NavigationConfig {
         }
 
         route.add(scrapePageUrl);
-        route.forEach(System.out::println);
     }
 
     public Queue<String> route() {
