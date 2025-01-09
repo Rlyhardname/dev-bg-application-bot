@@ -1,5 +1,9 @@
 <h1 align="center">CV APPLICATION AUTOMATION TOOL</h1>
 
+<h1>Demo</h1>
+
+[![Watch the video](https://img.youtube.com/vi/EEEKk7FEWAo/hqdefault.jpg)](https://youtu.be/EEEKk7FEWAo)
+
 <h3>About the tool:</h3>
 
 This tool is made specifically for the portal **DEV.BG**, a job listings marketplace tailored to IT specialists in Bulgaria.
